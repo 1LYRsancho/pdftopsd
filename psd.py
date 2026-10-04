@@ -3,7 +3,6 @@ import streamlit as st
 from pdf2image import convert_from_bytes
 from PIL import Image
 from psd_tools import PSDImage
-from psd_tools.api.layers import PixelLayer
 
 st.set_page_config(page_title="PDF to PSD Converter", page_icon="📄")
 
@@ -34,21 +33,23 @@ if uploaded_file is not None:
 
                 progress_bar = st.progress(0)
                 
-                # 1ページ目のサイズとモードを基準にして空のPSDを作成 (.new() を使用)
+                # 1ページ目のサイズとモードを基準にして空のPSDを作成
                 first_img = images[0].convert('RGB')
                 width, height = first_img.size
                 
                 # PSDオブジェクトを構築
                 psd = PSDImage.new(mode='RGB', size=(width, height))
 
-                # ページごとにレイヤーを作成して追加
+                # ページごとにピクセルレイヤーを追加
                 for idx, img in enumerate(images):
                     if img.mode != 'RGB':
                         img = img.convert('RGB')
 
-                    # PixelLayer.from_pil() を使用してレイヤーを作成
-                    layer = PixelLayer.from_pil(img)
-                    layer.name = f"Page {idx + 1}"
+                    # create_pixel_layer() を使用してPIL画像からレイヤーを生成
+                    layer = psd.create_pixel_layer(
+                        image=img,
+                        name=f"Page {idx + 1}"
+                    )
                     psd.append(layer)
 
                     # 進捗更新
