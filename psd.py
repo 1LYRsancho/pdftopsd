@@ -34,17 +34,19 @@ if uploaded_file is not None:
 
                 progress_bar = st.progress(0)
                 
-                # PSDオブジェクトを作成 (全体のサイズは1ページ目に合わせる)
-                width, height = images[0].size
-                psd = PSDImage(width=width, height=height)
+                # 1ページ目のサイズとモードを基準にして空のPSDを作成 (.new() を使用)
+                first_img = images[0].convert('RGB')
+                width, height = first_img.size
+                
+                # PSDオブジェクトを構築
+                psd = PSDImage.new(mode='RGB', size=(width, height))
 
-                # ページごとにレイヤーを追加
+                # ページごとにレイヤーを作成して追加
                 for idx, img in enumerate(images):
-                    # RGBモードに変換
                     if img.mode != 'RGB':
                         img = img.convert('RGB')
 
-                    # ページ用レイヤーを作成して配置
+                    # PixelLayer を追加
                     layer = PixelLayer.fromimage(img)
                     layer.name = f"Page {idx + 1}"
                     psd.append(layer)
@@ -59,7 +61,7 @@ if uploaded_file is not None:
 
                 st.success("PSDファイルの作成が完了しました！")
 
-                # 3. ダウンロードボタンを表示
+                # ダウンロードボタンを表示
                 output_filename = uploaded_file.name.rsplit(".", 1)[0] + "_layered.psd"
                 st.download_button(
                     label="PSDファイルをダウンロード",
