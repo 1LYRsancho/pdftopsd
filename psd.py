@@ -46,8 +46,8 @@ if uploaded_file is not None:
                     if img.mode != 'RGB':
                         img = img.convert('RGB')
 
-                    # PixelLayer を追加
-                    layer = PixelLayer.fromimage(img)
+                    # PixelLayer.from_pil() を使用してレイヤーを作成
+                    layer = PixelLayer.from_pil(img)
                     layer.name = f"Page {idx + 1}"
                     psd.append(layer)
 
